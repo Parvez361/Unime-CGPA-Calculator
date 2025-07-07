@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unime CGPA Calculator</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a modern look */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Basic animation for results and messages */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeInScale {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+        /* Hide sections by default, show based on active tab */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl w-full text-center">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-6">
+            🎓 Unime CGPA Calculator
+        </h1>
+
+        <p class="text-gray-600 mb-6 text-base sm:text-lg">
+            Choose a calculation mode below.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center mb-6 space-x-2 sm:space-x-4">
+            <button id="tab1Btn" class="tab-btn bg-indigo-600 text-white py-2 px-3 sm:px-6 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 font-semibold text-sm sm:text-base transition-colors duration-200">
+                Calculate New CGPA
+            </button>
+            <button id="tab2Btn" class="tab-btn bg-gray-200 text-gray-700 py-2 px-3 sm:px-6 rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 font-semibold text-sm sm:text-base transition-colors duration-200">
+                Convert Avg. Score
+            </button>
+            <button id="tab3Btn" class="tab-btn bg-gray-200 text-gray-700 py-2 px-3 sm:px-6 rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 font-semibold text-sm sm:text-base transition-colors duration-200">
+                Overall CGPA
+            </button>
+        </div>
+
+        <!-- Tab Content 1: Calculate Average Score & CGPA -->
+        <div id="tab1Content" class="tab-content active bg-gray-50 p-4 sm:p-6 rounded-lg shadow-inner mb-6">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Calculate New CGPA</h2>
+            <p class="text-gray-600 mb-4">Select subjects and enter your marks (out of 30).</p>
+
+            <div id="subjectInputsContainer" class="space-y-4 mb-4 text-left">
+                <!-- Subject input rows will be dynamically added here -->
+            </div>
+
+            <button id="addSubjectRowBtn" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 font-bold text-lg uppercase tracking-wider transform hover:-translate-y-0.5 transition-all duration-200 mb-4">
+                ➕ Add Subject
+            </button>
+
+            <button id="calculateNewCgpaBtn" class="w-full bg-indigo-700 text-white py-3 px-6 rounded-lg shadow-md hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 font-bold text-lg uppercase tracking-wider transform hover:-translate-y-0.5 transition-all duration-200">
+                📊 Calculate
+            </button>
+
+            <div id="newCgpaResult" class="mt-6 p-4 bg-indigo-100 text-indigo-800 rounded-lg text-xl sm:text-2xl font-semibold hidden animate-fadeInScale">
+                <!-- Result will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Tab Content 2: Convert Average Score to CGPA -->
+        <div id="tab2Content" class="tab-content bg-gray-50 p-4 sm:p-6 rounded-lg shadow-inner mb-6">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Convert Average Score to CGPA</h2>
+            <p class="text-gray-600 mb-4">Enter your average score (out of 30).</p>
+
+            <input
+                type="number"
+                id="avgScoreInput"
+                placeholder="Average Score (out of 30)"
+                step="0.01"
+                min="0"
+                max="30"
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base mb-4"
+                aria-label="Enter average score"
+            >
+
+            <button id="convertAvgToCgpaBtn" class="w-full bg-indigo-700 text-white py-3 px-6 rounded-lg shadow-md hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 font-bold text-lg uppercase tracking-wider transform hover:-translate-y-0.5 transition-all duration-200">
+                🔄 Convert
+            </button>
+
+            <div id="convertedCgpaResult" class="mt-6 p-4 bg-indigo-100 text-indigo-800 rounded-lg text-xl sm:text-2xl font-semibold hidden animate-fadeInScale">
+                <!-- Result will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Tab Content 3: Calculate Overall CGPA -->
+        <div id="tab3Content" class="tab-content bg-gray-50 p-4 sm:p-6 rounded-lg shadow-inner mb-6">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Calculate Overall CGPA</h2>
+            <p class="text-gray-600 mb-4">Enter your previous and new scores/credits.</p>
+
+            <input
+                type="number"
+                id="prevAvgInput"
+                placeholder="Previous Average Score"
+                step="0.01"
+                min="0"
+                max="30"
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base mb-3"
+                aria-label="Enter previous average score"
+            >
+            <input
+                type="number"
+                id="prevCreditsInput"
+                placeholder="Previous Total Credits"
+                step="0.5"
+                min="0"
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base mb-3"
+                aria-label="Enter previous total credits"
+            >
+            <input
+                type="number"
+                id="newAvgInput"
+                placeholder="New Average Score"
+                step="0.01"
+                min="0"
+                max="30"
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base mb-3"
+                aria-label="Enter new average score"
+            >
+            <input
+                type="number"
+                id="newCreditsInput"
+                placeholder="New Total Credits"
+                step="0.5"
+                min="0"
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base mb-4"
+                aria-label="Enter new total credits"
+            >
+
+            <button id="calculateOverallCgpaBtn" class="w-full bg-indigo-700 text-white py-3 px-6 rounded-lg shadow-md hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 font-bold text-lg uppercase tracking-wider transform hover:-translate-y-0.5 transition-all duration-200">
+                📈 Calculate Overall
+            </button>
+
+            <div id="overallCgpaResult" class="mt-6 p-4 bg-indigo-100 text-indigo-800 rounded-lg text-xl sm:text-2xl font-semibold hidden animate-fadeInScale">
+                <!-- Result will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Custom Message Box for errors/info -->
+        <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
+                <p id="messageBoxText" class="text-xl font-semibold text-gray-800 mb-4"></p>
+                <button id="closeMessageBox" class="bg-indigo-600 text-white py-2 px-5 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Subject Data (Translated from C struct array) ---
+        const subjects = [
+            // Year 1
+            { name: "Calculus 1", credits: 6 },
+            { name: "Physics 1", credits: 6 },
+            { name: "Discrete Mathematics", credits: 6 },
+            { name: "Programming", credits: 9 },
+            { name: "Calculus 2", credits: 6 },
+            { name: "Physics 2", credits: 6 },
+            { name: "Mathematics for Data Analysis", credits: 6 },
+            { name: "Algorithm and Data Structure", credits: 9 },
+            // Year 2
+            { name: "Computer Networks", credits: 6 },
+            { name: "Database", credits: 12 },
+            { name: "Devices for AI", credits: 12 },
+            { name: "Object Oriented Programming", credits: 9 },
+            { name: "Operating System", credits: 12 },
+            { name: "Statistical Methods and Models", credits: 6 },
+            // Year 3
+            { name: "Artificial Intelligence", credits: 12 },
+            { name: "Final Dissertation", credits: 6 },
+            { name: "Software Engineering", credits: 6 },
+            { name: "System Security", credits: 6 },
+            { name: "Web Programming", credits: 9 },
+            // Optional subjects
+            { name: "Data Modeling", credits: 6 },
+            { name: "Wireless Sensor Networks", credits: 6 },
+            // Internship
+            { name: "Internship", credits: 4 }
+        ];
+
+        // --- DOM Element References ---
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        const subjectInputsContainer = document.getElementById('subjectInputsContainer');
+        const addSubjectRowBtn = document.getElementById('addSubjectRowBtn');
+        const calculateNewCgpaBtn = document.getElementById('calculateNewCgpaBtn');
+        const newCgpaResult = document.getElementById('newCgpaResult');
+
+        const avgScoreInput = document.getElementById('avgScoreInput');
+        const convertAvgToCgpaBtn = document.getElementById('convertAvgToCgpaBtn');
+        const convertedCgpaResult = document.getElementById('convertedCgpaResult');
+
+        const prevAvgInput = document.getElementById('prevAvgInput');
+        const prevCreditsInput = document.getElementById('prevCreditsInput');
+        const newAvgInput = document.getElementById('newAvgInput');
+        const newCreditsInput = document.getElementById('newCreditsInput');
+        const calculateOverallCgpaBtn = document.getElementById('calculateOverallCgpaBtn');
+        const overallCgpaResult = document.getElementById('overallCgpaResult');
+
+        const messageBox = document.getElementById('messageBox');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const closeMessageBoxBtn = document.getElementById('closeMessageBox');
+
+        let subjectRowCounter = 0; // To ensure unique IDs for dynamically added rows
+
+        // --- Event Listeners ---
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => switchTab(button.id));
+        });
+
+        addSubjectRowBtn.addEventListener('click', addSubjectRow);
+        calculateNewCgpaBtn.addEventListener('click', calculateAverageScoreAndCGPA);
+
+        convertAvgToCgpaBtn.addEventListener('click', convertAverageScoreToCGPA);
+        calculateOverallCgpaBtn.addEventListener('click', calculateOverallCGPA);
+
+        closeMessageBoxBtn.addEventListener('click', () => messageBox.classList.add('hidden'));
+
+        // --- Initial Setup ---
+        // Show the first tab by default
+        switchTab('tab1Btn');
+        // Add a few initial subject rows for convenience
+        document.addEventListener('DOMContentLoaded', () => {
+            addSubjectRow();
+            addSubjectRow();
+        });
+
+
+        // --- Functions for UI Management ---
+
+        /**
+         * Switches between different calculation tabs.
+         * @param {string} activeTabId - The ID of the button for the tab to activate.
+         */
+        function switchTab(activeTabId) {
+            // Deactivate all buttons and hide all content
+            tabButtons.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Activate the selected button and show its content
+            const activeBtn = document.getElementById(activeTabId);
+            activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            activeBtn.classList.add('bg-indigo-600', 'text-white');
+
+            const contentId = activeTabId.replace('Btn', 'Content');
+            document.getElementById(contentId).classList.add('active');
+
+            // Hide all results when switching tabs
+            newCgpaResult.classList.add('hidden');
+            convertedCgpaResult.classList.add('hidden');
+            overallCgpaResult.classList.add('hidden');
+        }
+
+        /**
+         * Displays a custom message box.
+         * @param {string} message - The message to display.
+         */
+        function displayMessageBox(message) {
+            messageBoxText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        // --- Functions for Tab 1: Calculate Average Score & CGPA ---
+
+        /**
+         * Adds a new row for subject input (dropdown for subject choice and input for marks).
+         */
+        function addSubjectRow() {
+            subjectRowCounter++;
+            const rowId = `subjectRow-${subjectRowCounter}`;
+            const subjectRow = document.createElement('div');
+            subjectRow.id = rowId;
+            subjectRow.className = 'flex flex-col sm:flex-row gap-2 items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+            subjectRow.innerHTML = `
+                <select
+                    id="subjectSelect-${subjectRowCounter}"
+                    class="w-full sm:w-2/3 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base bg-white"
+                    aria-label="Select subject"
+                >
+                    <option value="">-- Select Subject --</option>
+                    ${subjects.map((sub, index) => `<option value="${index}">${sub.name} (${sub.credits} CFU)</option>`).join('')}
+                </select>
+                <input
+                    type="number"
+                    id="marksInput-${subjectRowCounter}"
+                    placeholder="Marks (out of 30)"
+                    step="0.01"
+                    min="0"
+                    max="30"
+                    class="w-full sm:w-1/3 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-base"
+                    aria-label="Enter marks for subject"
+                >
+                <button
+                    data-row-id="${rowId}"
+                    class="remove-subject-row-btn bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-200 flex-shrink-0"
+                    aria-label="Remove subject row"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            `;
+            subjectInputsContainer.appendChild(subjectRow);
+
+            // Add event listener for the new remove button
+            subjectRow.querySelector('.remove-subject-row-btn').addEventListener('click', (event) => {
+                const idToRemove = event.currentTarget.dataset.rowId;
+                document.getElementById(idToRemove).remove();
+            });
+        }
+
+        /**
+         * Calculates the average score and CGPA based on selected subjects and marks.
+         */
+        function calculateAverageScoreAndCGPA() {
+            let totalWeightedScore = 0;
+            let totalCredits = 0;
+            let isValid = true;
+            const selectedSubjects = new Set(); // To prevent duplicate subject selection
+
+            const rows = subjectInputsContainer.querySelectorAll('.flex');
+
+            if (rows.length === 0) {
+                displayMessageBox('Please add at least one subject row.');
+                newCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            rows.forEach(row => {
+                const subjectSelect = row.querySelector('select[id^="subjectSelect-"]');
+                const marksInput = row.querySelector('input[id^="marksInput-"]');
+
+                const selectedIndex = parseInt(subjectSelect.value);
+                const marks = parseFloat(marksInput.value);
+
+                // Reset validation styling
+                subjectSelect.classList.remove('border-red-500', 'ring-red-200');
+                marksInput.classList.remove('border-red-500', 'ring-red-200');
+
+                if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= subjects.length) {
+                    isValid = false;
+                    subjectSelect.classList.add('border-red-500', 'ring-red-200');
+                    return;
+                }
+
+                if (selectedSubjects.has(selectedIndex)) {
+                    isValid = false;
+                    subjectSelect.classList.add('border-red-500', 'ring-red-200');
+                    displayMessageBox('Duplicate subject selected. Please select unique subjects.');
+                    return;
+                }
+                selectedSubjects.add(selectedIndex);
+
+                if (isNaN(marks) || marks < 0 || marks > 30) {
+                    isValid = false;
+                    marksInput.classList.add('border-red-500', 'ring-red-200');
+                    return;
+                }
+
+                const subject = subjects[selectedIndex];
+                totalWeightedScore += marks * subject.credits;
+                totalCredits += subject.credits;
+            });
+
+            if (!isValid) {
+                displayMessageBox('Please ensure all subjects are selected and marks are valid (0-30).');
+                newCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            if (totalCredits === 0) {
+                displayMessageBox('Total credits cannot be zero. Please select subjects with valid credits.');
+                newCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            const avgScore = totalWeightedScore / totalCredits;
+            const cgpa = (avgScore * 4) / 30;
+
+            newCgpaResult.innerHTML = `
+                <p>Average Score: <span class="font-bold">${avgScore.toFixed(2)}</span></p>
+                <p>CGPA: <span class="font-bold">${cgpa.toFixed(2)}</span></p>
+            `;
+            newCgpaResult.classList.remove('hidden');
+            newCgpaResult.classList.add('animate-fadeInScale');
+        }
+
+        // --- Functions for Tab 2: Convert Average Score to CGPA ---
+
+        /**
+         * Converts a given average score to CGPA.
+         */
+        function convertAverageScoreToCGPA() {
+            const avgScore = parseFloat(avgScoreInput.value);
+
+            // Reset validation styling
+            avgScoreInput.classList.remove('border-red-500', 'ring-red-200');
+
+            if (isNaN(avgScore) || avgScore < 0 || avgScore > 30) {
+                displayMessageBox('Please enter a valid average score between 0 and 30.');
+                avgScoreInput.classList.add('border-red-500', 'ring-red-200');
+                convertedCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            const cgpa = (avgScore * 4) / 30;
+            convertedCgpaResult.innerHTML = `CGPA: <span class="font-bold">${cgpa.toFixed(2)}</span>`;
+            convertedCgpaResult.classList.remove('hidden');
+            convertedCgpaResult.classList.add('animate-fadeInScale');
+        }
+
+        // --- Functions for Tab 3: Calculate Overall CGPA ---
+
+        /**
+         * Calculates the overall CGPA combining previous and new scores.
+         */
+        function calculateOverallCGPA() {
+            const prevAvg = parseFloat(prevAvgInput.value);
+            const prevCredits = parseFloat(prevCreditsInput.value);
+            const newAvg = parseFloat(newAvgInput.value);
+            const newCredits = parseFloat(newCreditsInput.value);
+
+            // Reset validation styling
+            prevAvgInput.classList.remove('border-red-500', 'ring-red-200');
+            prevCreditsInput.classList.remove('border-red-500', 'ring-red-200');
+            newAvgInput.classList.remove('border-red-500', 'ring-red-200');
+            newCreditsInput.classList.remove('border-red-500', 'ring-red-200');
+
+            if (isNaN(prevAvg) || prevAvg < 0 || prevAvg > 30) {
+                prevAvgInput.classList.add('border-red-500', 'ring-red-200');
+                displayMessageBox('Please enter a valid previous average score (0-30).');
+                overallCgpaResult.classList.add('hidden');
+                return;
+            }
+            if (isNaN(prevCredits) || prevCredits < 0) {
+                prevCreditsInput.classList.add('border-red-500', 'ring-red-200');
+                displayMessageBox('Please enter valid previous total credits (non-negative).');
+                overallCgpaResult.classList.add('hidden');
+                return;
+            }
+            if (isNaN(newAvg) || newAvg < 0 || newAvg > 30) {
+                newAvgInput.classList.add('border-red-500', 'ring-red-200');
+                displayMessageBox('Please enter a valid new average score (0-30).');
+                overallCgpaResult.classList.add('hidden');
+                return;
+            }
+            if (isNaN(newCredits) || newCredits < 0) {
+                newCreditsInput.classList.add('border-red-500', 'ring-red-200');
+                displayMessageBox('Please enter valid new total credits (non-negative).');
+                overallCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            const totalCredits = prevCredits + newCredits;
+
+            if (totalCredits === 0) {
+                displayMessageBox('Total combined credits cannot be zero.');
+                overallCgpaResult.classList.add('hidden');
+                return;
+            }
+
+            const overallAvg = ((prevAvg * prevCredits) + (newAvg * newCredits)) / totalCredits;
+            const overallCgpa = (overallAvg * 4) / 30;
+
+            overallCgpaResult.innerHTML = `
+                <p>Overall Average Score: <span class="font-bold">${overallAvg.toFixed(2)}</span></p>
+                <p>Overall CGPA: <span class="font-bold">${overallCgpa.toFixed(2)}</span></p>
+            `;
+            overallCgpaResult.classList.remove('hidden');
+            overallCgpaResult.classList.add('animate-fadeInScale');
+        }
+    </script>
+</body>
+</html>
